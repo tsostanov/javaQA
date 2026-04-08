@@ -21,4 +21,10 @@ class LnModuleTest {
     void shouldReturnNaNOutsideDomain(double x) {
         assertTrue(Double.isNaN(lnModule.calculate(x)));
     }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {Double.POSITIVE_INFINITY, Double.NaN})
+    void shouldReturnNaNForNonFiniteInput(double x) {
+        assertTrue(Double.isNaN(lnModule.calculate(x)));
+    }
 }

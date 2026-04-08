@@ -27,12 +27,20 @@ public final class Main {
         double from = Double.parseDouble(args[1]);
         double to = Double.parseDouble(args[2]);
         double step = Double.parseDouble(args[3]);
-        Path output = args.length >= 5 ? Path.of(args[4]) : Path.of(moduleName + ".csv");
-        double epsilon = args.length >= 6 ? Double.parseDouble(args[5]) : 1.0E-8;
+        Path output = resolveOutput(moduleName, args);
+        double epsilon = resolveEpsilon(args);
 
         MathModule module = createModule(moduleName, epsilon);
         CsvExporter exporter = new CsvExporter();
         exporter.export(module, from, to, step, output);
+    }
+
+    private static Path resolveOutput(String moduleName, String[] args) {
+        return args.length >= 5 ? Path.of(args[4]) : Path.of(moduleName + ".csv");
+    }
+
+    private static double resolveEpsilon(String[] args) {
+        return args.length >= 6 ? Double.parseDouble(args[5]) : 1.0E-8;
     }
 
     private static MathModule createModule(String moduleName, double epsilon) {

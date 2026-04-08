@@ -3,9 +3,13 @@ package ru.ifmo.se.lab2.modules.system;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import ru.ifmo.se.lab2.modules.MathModule;
 import ru.ifmo.se.lab2.modules.logs.LnModule;
 import ru.ifmo.se.lab2.modules.logs.LogModule;
 import ru.ifmo.se.lab2.modules.trig.CosModule;
@@ -72,5 +76,69 @@ class FunctionSystemModuleTest {
     @ValueSource(doubles = {Math.PI, 2.5})
     void shouldUseLogBranchForPositiveValues(double x) {
         assertTrue(Double.isFinite(functionSystem.calculate(x)));
+    }
+
+    @ParameterizedTest
+    @MethodSource("trigBranchNaNDependencies")
+    void shouldReturnNaNWhenTrigDependencyReturnsNaN(
+            MathModule sin,
+            MathModule cos,
+            MathModule sec,
+            MathModule csc,
+            MathModule cot
+    ) {
+        FunctionSystemModule system = new FunctionSystemModule(
+                cos, sin, sec, csc, cot,
+                constantModule(1.0), constantModule(1.0), constantModule(1.0), constantModule(1.0), constantModule(1.0),
+                1.0E-8
+        );
+
+        assertTrue(Double.isNaN(system.calculate(-1.0)));
+    }
+
+    @ParameterizedTest
+    @MethodSource("logBranchNaNDependencies")
+    void shouldReturnNaNWhenLogDependencyReturnsNaN(
+            MathModule ln,
+            MathModule log2,
+            MathModule log3,
+            MathModule log5,
+            MathModule log10
+    ) {
+        FunctionSystemModule system = new FunctionSystemModule(
+                constantModule(0.5), constantModule(0.5), constantModule(2.0), constantModule(2.0), constantModule(1.0),
+                ln, log2, log3, log5, log10,
+                1.0E-8
+        );
+
+        assertTrue(Double.isNaN(system.calculate(1.0)));
+    }
+
+    private static Stream<Arguments> trigBranchNaNDependencies() {
+        return Stream.of(
+                Arguments.of(nanModule(), constantModule(0.5), constantModule(2.0), constantModule(2.0), constantModule(1.0)),
+                Arguments.of(constantModule(0.5), nanModule(), constantModule(2.0), constantModule(2.0), constantModule(1.0)),
+                Arguments.of(constantModule(0.5), constantModule(0.5), nanModule(), constantModule(2.0), constantModule(1.0)),
+                Arguments.of(constantModule(0.5), constantModule(0.5), constantModule(2.0), nanModule(), constantModule(1.0)),
+                Arguments.of(constantModule(0.5), constantModule(0.5), constantModule(2.0), constantModule(2.0), nanModule())
+        );
+    }
+
+    private static Stream<Arguments> logBranchNaNDependencies() {
+        return Stream.of(
+                Arguments.of(nanModule(), constantModule(1.0), constantModule(1.0), constantModule(1.0), constantModule(1.0)),
+                Arguments.of(constantModule(1.0), nanModule(), constantModule(1.0), constantModule(1.0), constantModule(1.0)),
+                Arguments.of(constantModule(1.0), constantModule(1.0), nanModule(), constantModule(1.0), constantModule(1.0)),
+                Arguments.of(constantModule(1.0), constantModule(1.0), constantModule(1.0), nanModule(), constantModule(1.0)),
+                Arguments.of(constantModule(1.0), constantModule(1.0), constantModule(1.0), constantModule(1.0), nanModule())
+        );
+    }
+
+    private static MathModule constantModule(double value) {
+        return x -> value;
+    }
+
+    private static MathModule nanModule() {
+        return x -> Double.NaN;
     }
 }

@@ -43,9 +43,6 @@ public final class LnModule extends AbstractMathModule {
             }
             power *= ySquared;
             n++;
-            if (n > 1_000_000) {
-                break;
-            }
         }
 
         return 2.0 * sum + scalePower * LN_2;

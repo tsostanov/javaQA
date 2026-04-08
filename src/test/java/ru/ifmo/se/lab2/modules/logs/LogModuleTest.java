@@ -15,6 +15,7 @@ class LogModuleTest {
         LogModule logModule = new LogModule(2.0, lnModule, 1.0E-10);
 
         assertEquals(Math.log(8.0) / Math.log(2.0), logModule.calculate(8.0), EPS);
+        assertEquals(2.0, logModule.getBase(), 0.0);
     }
 
     @Test

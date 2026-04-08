@@ -1,7 +1,9 @@
 package ru.ifmo.se.lab2.modules.trig;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -13,5 +15,22 @@ class CosModuleTest {
     @ValueSource(doubles = {-3.0, -Math.PI, -1.0, -0.5, 0.0, 0.5, 1.0, Math.PI / 3.0, Math.PI})
     void shouldApproximateMathCos(double x) {
         assertEquals(Math.cos(x), cosModule.calculate(x), EPS);
+    }
+
+    @Test
+    void shouldNormalizeAnglesBelowNegativePi() {
+        double x = -3.0 * Math.PI / 2.0;
+
+        assertEquals(Math.cos(x), cosModule.calculate(x), EPS);
+    }
+
+    @Test
+    void shouldReturnNaNForNaNInput() {
+        assertTrue(Double.isNaN(cosModule.calculate(Double.NaN)));
+    }
+
+    @Test
+    void shouldReturnNaNForInfiniteInput() {
+        assertTrue(Double.isNaN(cosModule.calculate(Double.POSITIVE_INFINITY)));
     }
 }

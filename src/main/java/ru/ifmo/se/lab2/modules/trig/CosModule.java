@@ -24,9 +24,6 @@ public final class CosModule extends AbstractMathModule {
             term *= -normalized * normalized / ((2.0 * n - 1.0) * (2.0 * n));
             sum += term;
             n++;
-            if (n > 10_000) {
-                break;
-            }
         }
 
         return sum;
