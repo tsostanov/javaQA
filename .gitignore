@@ -1,0 +1,8 @@
+target/
+.m2repo/
+m2repo/
+lib/
+*.csv
+test-sources.txt
+Check.java
+Check.class
