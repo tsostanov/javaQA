@@ -1,4 +1,4 @@
-package ru.ifmo.se.lab2;
+package ru.ifmo.se.lab2.infra;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import ru.ifmo.se.lab2.Main;
 import ru.ifmo.se.lab2.modules.system.FunctionSystemModule;
 import ru.ifmo.se.lab2.modules.trig.CosModule;
 import ru.ifmo.se.lab2.modules.trig.CotModule;

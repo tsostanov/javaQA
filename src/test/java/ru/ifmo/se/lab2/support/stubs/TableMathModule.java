@@ -1,4 +1,4 @@
-package ru.ifmo.se.lab2.stubs;
+package ru.ifmo.se.lab2.support.stubs;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +18,10 @@ public final class TableMathModule implements MathModule {
             values.put(Double.doubleToLongBits(point), function.applyAsDouble(point));
         }
         return new TableMathModule(values);
+    }
+
+    public static TableMathModule fromValues(Map<Long, Double> values) {
+        return new TableMathModule(new HashMap<>(values));
     }
 
     @Override

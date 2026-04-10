@@ -1,4 +1,4 @@
-package ru.ifmo.se.lab2.spies;
+package ru.ifmo.se.lab2.support.spies;
 
 import java.util.ArrayList;
 import java.util.List;

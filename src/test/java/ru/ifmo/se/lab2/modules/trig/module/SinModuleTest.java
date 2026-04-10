@@ -1,14 +1,17 @@
-package ru.ifmo.se.lab2.modules.trig;
+package ru.ifmo.se.lab2.modules.trig.module;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import ru.ifmo.se.lab2.mocks.VerifiableMathModuleMock;
+import ru.ifmo.se.lab2.modules.trig.SinModule;
+import ru.ifmo.se.lab2.support.mocks.VerifiableMathModuleMock;
 
 class SinModuleTest {
+    private static final double HALF_PI = 1.5707963267948966;
+
     @Test
     void shouldBeDerivedFromCosModule() {
-        double shiftedArgument = Math.PI / 2.0 - 1.23;
+        double shiftedArgument = HALF_PI - 1.23;
         VerifiableMathModuleMock cosMock = new VerifiableMathModuleMock()
                 .expectCall(shiftedArgument, 7.5);
         SinModule sinModule = new SinModule(cosMock, 1.0E-8);

@@ -1,25 +1,21 @@
-# Лабораторная работа №2: система функций
+# Лабораторная работа №2
 
-Проект на `Java 17` и `Maven` для лабораторной работы по ТПО.
+Проект на `Java 17` и `Maven` для лабораторной по ТПО. Внутри реализована система функций, которая собирается из тригонометрических и логарифмических модулей и умеет выгружать значения в `CSV`.
+
+## Что есть в проекте
 
 Базовые функции:
 
-- базовая тригонометрическая функция: `cos(x)`
-- базовая логарифмическая функция: `ln(x)`
+- `cos(x)`
+- `ln(x)`
 
-Все остальные тригонометрические и логарифмические функции выражаются через них.
+Производные функции:
 
-## Структура проекта
+- тригонометрические: `sin`, `sec`, `csc`, `cot`
+- логарифмические: `log2`, `log3`, `log5`, `log10`
+- итоговая система: `system`
 
-- `src/main/java/ru/ifmo/se/lab2/modules/trig` - тригонометрические модули: `cos`, `sin`, `sec`, `csc`, `cot`
-- `src/main/java/ru/ifmo/se/lab2/modules/logs` - логарифмические модули: `ln`, `log2`, `log3`, `log5`, `log10`
-- `src/main/java/ru/ifmo/se/lab2/modules/system` - модуль системы функций
-- `src/main/java/ru/ifmo/se/lab2/io` - экспорт значений в `CSV`
-- `src/test/java/ru/ifmo/se/lab2/stubs` - табличные заглушки для интеграционных тестов
-- `src/test/java/ru/ifmo/se/lab2/mocks` - проверяемые mock-объекты
-- `src/test/java/ru/ifmo/se/lab2/spies` - spy-объекты для отслеживания вызовов
-
-## Система функций
+Система считается по частям:
 
 Для `x <= 0`:
 
@@ -34,36 +30,59 @@
 (log10(x) * log10(x) * log2(x)) + log3(x) + log5(x) + (ln(x)^3)
 ```
 
-## Сборка проекта
+## Структура
 
-Сборка без запуска тестов:
+Основной код:
+
+- `src/main/java/ru/ifmo/se/lab2/modules/trig` — тригонометрические модули
+- `src/main/java/ru/ifmo/se/lab2/modules/logs` — логарифмические модули
+- `src/main/java/ru/ifmo/se/lab2/modules/system` — система функций
+- `src/main/java/ru/ifmo/se/lab2/io` — экспорт значений в `CSV`
+- `src/main/java/ru/ifmo/se/lab2/Main.java` — точка входа
+
+Тесты:
+
+- `src/test/java/ru/ifmo/se/lab2/contract` — общие проверки базовой абстракции
+- `src/test/java/ru/ifmo/se/lab2/modules/*/module` — модульные тесты
+- `src/test/java/ru/ifmo/se/lab2/modules/*/integration` — интеграционные тесты
+- `src/test/java/ru/ifmo/se/lab2/infra` — тесты CLI и `CSV`-экспорта
+- `src/test/java/ru/ifmo/se/lab2/support` — test doubles и чтение табличных данных
+
+Тестовые данные лежат в `src/test/resources/testdata`:
+
+- `module` — таблицы для модульных тестов
+- `integration` — таблицы для интеграционных тестов
+
+## Сборка
+
+Собрать проект без запуска тестов:
 
 ```powershell
-mvn "-Dmaven.test.skip=true" package
+mvn -Dmaven.test.skip=true package
 ```
 
-Итоговый jar-файл:
+Готовый артефакт:
 
 ```text
 target/tpojava-1.0-SNAPSHOT.jar
 ```
 
-## Запуск приложения
+## Запуск
 
-Пример запуска:
+Пример:
 
 ```powershell
 java -jar target\tpojava-1.0-SNAPSHOT.jar system -2 2 0.1 result.csv 1E-8
 ```
 
-Аргументы командной строки:
+Аргументы:
 
-- имя модуля
-- начальное значение `x`
-- конечное значение `x`
-- шаг
-- путь к `csv`-файлу, необязательно
-- `epsilon`, необязательно
+1. имя модуля
+2. начало диапазона `x`
+3. конец диапазона `x`
+4. шаг
+5. путь к `csv`-файлу, необязательно
+6. `epsilon`, необязательно
 
 Доступные модули:
 
@@ -71,42 +90,28 @@ java -jar target\tpojava-1.0-SNAPSHOT.jar system -2 2 0.1 result.csv 1E-8
 system, cos, sin, sec, csc, cot, ln, log2, log3, log5, log10
 ```
 
-## Тестирование
+Если путь к файлу не передан, результат будет записан в `<module>.csv`.
 
-Запуск тестов:
+## Тесты
+
+Быстрый прогон модульных, контрактных и инфраструктурных тестов:
 
 ```powershell
 mvn test
 ```
 
-Запуск тестов с отчетом о покрытии:
+Полный прогон вместе с интеграционными тестами, отчетом JaCoCo и проверкой покрытия:
 
 ```powershell
-mvn clean verify
+mvn verify
 ```
 
-Отчет JaCoCo:
+Интеграционные тесты запускаются на фазе `verify` через `failsafe`, поэтому `mvn test` и `mvn verify` дают разный объем проверки.
+
+Отчет по покрытию:
 
 ```text
 target/site/jacoco/index.html
 ```
 
-В проекте также включена проверка минимального покрытия кода.
-
-## Интеграционное тестирование
-
-В проекте есть:
-
-- модульные тесты для базовых и производных функций
-- интеграционные тесты для тригонометрических модулей
-- интеграционные тесты для логарифмических модулей
-- интеграционные тесты для полной системы функций
-
-Используемые test doubles:
-
-- `stubs`:
-  `TableMathModule`, `ModuleStubFactory`
-- `mocks`:
-  `VerifiableMathModuleMock`
-- `spies`:
-  `TrackingMathModuleSpy`
+Минимальный порог покрытия сейчас проверяется автоматически в Maven.

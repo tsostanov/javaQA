@@ -1,4 +1,4 @@
-package ru.ifmo.se.lab2.mocks;
+package ru.ifmo.se.lab2.support.mocks;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

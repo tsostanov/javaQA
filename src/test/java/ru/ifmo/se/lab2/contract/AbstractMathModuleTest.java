@@ -1,10 +1,11 @@
-package ru.ifmo.se.lab2.modules;
+package ru.ifmo.se.lab2.contract;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import ru.ifmo.se.lab2.modules.AbstractMathModule;
 
 class AbstractMathModuleTest {
     @Test

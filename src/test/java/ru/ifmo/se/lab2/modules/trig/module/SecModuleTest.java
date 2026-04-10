@@ -1,10 +1,11 @@
-package ru.ifmo.se.lab2.modules.trig;
+package ru.ifmo.se.lab2.modules.trig.module;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import ru.ifmo.se.lab2.spies.TrackingMathModuleSpy;
+import ru.ifmo.se.lab2.modules.trig.SecModule;
+import ru.ifmo.se.lab2.support.spies.TrackingMathModuleSpy;
 
 class SecModuleTest {
     private static final double EPS = 1.0E-8;

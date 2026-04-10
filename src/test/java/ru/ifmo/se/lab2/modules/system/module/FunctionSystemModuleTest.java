@@ -1,4 +1,4 @@
-package ru.ifmo.se.lab2.modules.system;
+package ru.ifmo.se.lab2.modules.system.module;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -12,11 +12,13 @@ import org.junit.jupiter.params.provider.ValueSource;
 import ru.ifmo.se.lab2.modules.MathModule;
 import ru.ifmo.se.lab2.modules.logs.LnModule;
 import ru.ifmo.se.lab2.modules.logs.LogModule;
+import ru.ifmo.se.lab2.modules.system.FunctionSystemModule;
 import ru.ifmo.se.lab2.modules.trig.CosModule;
 import ru.ifmo.se.lab2.modules.trig.CotModule;
 import ru.ifmo.se.lab2.modules.trig.CscModule;
 import ru.ifmo.se.lab2.modules.trig.SecModule;
 import ru.ifmo.se.lab2.modules.trig.SinModule;
+import ru.ifmo.se.lab2.support.CsvTestData;
 
 class FunctionSystemModuleTest {
     private static final double EPS = 1.0E-5;
@@ -39,41 +41,25 @@ class FunctionSystemModuleTest {
     }
 
     @ParameterizedTest
-    @ValueSource(doubles = {-2.3, -1.2, -0.7})
-    void shouldCalculateTrigBranch(double x) {
-        double sin = Math.sin(x);
-        double cos = Math.cos(x);
-        double sec = 1.0 / cos;
-        double csc = 1.0 / sin;
-        double cot = cos / sin;
-        double numerator = Math.pow((((csc / csc) / sec) - sin + cot), 3.0) + (cos + csc) - (sec - sin);
-        double denominator = ((Math.pow(cot, 2.0) / (csc + sec)) * Math.pow(sin, 2.0));
-        double expected = Math.pow(numerator / denominator, 2.0) / cot;
-
+    @MethodSource("trigBranchCases")
+    void shouldCalculateTrigBranch(double x, double expected) {
         assertEquals(expected, functionSystem.calculate(x), EPS);
     }
 
     @ParameterizedTest
-    @ValueSource(doubles = {0.2, 0.7, 1.5, 3.0})
-    void shouldCalculateLogBranch(double x) {
-        double log10 = Math.log10(x);
-        double log2 = Math.log(x) / Math.log(2.0);
-        double log3 = Math.log(x) / Math.log(3.0);
-        double log5 = Math.log(x) / Math.log(5.0);
-        double ln = Math.log(x);
-        double expected = (log10 * log10 * log2) + log3 + log5 + Math.pow(ln, 3.0);
-
+    @MethodSource("logBranchCases")
+    void shouldCalculateLogBranch(double x, double expected) {
         assertEquals(expected, functionSystem.calculate(x), EPS);
     }
 
     @ParameterizedTest
-    @ValueSource(doubles = {0.0, -Math.PI})
+    @ValueSource(doubles = {0.0, -3.1415926535897931})
     void shouldReturnNaNAtSingularPointsOfSelectedBranch(double x) {
         assertTrue(Double.isNaN(functionSystem.calculate(x)));
     }
 
     @ParameterizedTest
-    @ValueSource(doubles = {Math.PI, 2.5})
+    @ValueSource(doubles = {3.1415926535897931, 2.5})
     void shouldUseLogBranchForPositiveValues(double x) {
         assertTrue(Double.isFinite(functionSystem.calculate(x)));
     }
@@ -140,5 +126,13 @@ class FunctionSystemModuleTest {
 
     private static MathModule nanModule() {
         return x -> Double.NaN;
+    }
+
+    private static Stream<Arguments> trigBranchCases() {
+        return CsvTestData.arguments("/testdata/module/system/trig-branch.csv");
+    }
+
+    private static Stream<Arguments> logBranchCases() {
+        return CsvTestData.arguments("/testdata/module/system/log-branch.csv");
     }
 }
