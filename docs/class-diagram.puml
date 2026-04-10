@@ -2,6 +2,7 @@
 skinparam classAttributeIconSize 0
 skinparam shadowing false
 skinparam packageStyle rectangle
+title Main Class Diagram
 
 package "ru.ifmo.se.lab2" {
   class Main
@@ -80,5 +81,11 @@ note right of FunctionSystemModule
   x <= 0: trig branch
   x > 0: log branch
 end note
+
+legend right
+  Solid triangle: inheritance / implementation
+  Arrow --> : dependency via field or method usage
+  Dashed arrow ..> : object creation / runtime usage
+endlegend
 
 @enduml

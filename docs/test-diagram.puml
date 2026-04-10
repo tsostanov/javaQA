@@ -1,0 +1,101 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam packageStyle rectangle
+title Test Architecture Diagram
+
+package "ru.ifmo.se.lab2.contract" {
+  class AbstractMathModuleTest
+}
+
+package "ru.ifmo.se.lab2.infra" {
+  class MainTest
+}
+
+package "ru.ifmo.se.lab2.infra.io" {
+  class CsvExporterTest
+}
+
+package "ru.ifmo.se.lab2.modules.trig.module" {
+  class CosModuleTest
+  class SinModuleTest
+  class SecModuleTest
+  class CscModuleTest
+  class CotModuleTest
+}
+
+package "ru.ifmo.se.lab2.modules.trig.integration" {
+  class TrigIntegrationSupport
+  class SinIntegrationTest
+  class SecIntegrationTest
+  class CscIntegrationTest
+  class CotIntegrationTest
+}
+
+package "ru.ifmo.se.lab2.modules.logs.module" {
+  class LnModuleTest
+  class LogModuleTest
+}
+
+package "ru.ifmo.se.lab2.modules.logs.integration" {
+  class LogIntegrationTest
+}
+
+package "ru.ifmo.se.lab2.modules.system.module" {
+  class FunctionSystemModuleTest
+}
+
+package "ru.ifmo.se.lab2.modules.system.integration" {
+  class FunctionSystemIntegrationTest
+}
+
+package "ru.ifmo.se.lab2.support" {
+  class CsvTestData
+  class MockitoMathModuleFactory
+}
+
+SinModuleTest ..> "Mockito mock" : cosModule
+SecModuleTest ..> "Mockito mock" : cosModule
+CscModuleTest ..> "Mockito mock" : sinModule
+CotModuleTest ..> "Mockito mock" : cos/sin
+
+SinIntegrationTest --> TrigIntegrationSupport
+SecIntegrationTest --> TrigIntegrationSupport
+CscIntegrationTest --> TrigIntegrationSupport
+CotIntegrationTest --> TrigIntegrationSupport
+
+SinIntegrationTest --> MockitoMathModuleFactory
+SecIntegrationTest --> MockitoMathModuleFactory
+CscIntegrationTest --> MockitoMathModuleFactory
+CotIntegrationTest --> MockitoMathModuleFactory
+LogIntegrationTest --> MockitoMathModuleFactory
+FunctionSystemIntegrationTest --> MockitoMathModuleFactory
+
+CosModuleTest --> CsvTestData
+LnModuleTest --> CsvTestData
+LogModuleTest --> CsvTestData
+FunctionSystemModuleTest --> CsvTestData
+TrigIntegrationSupport --> CsvTestData
+LogIntegrationTest --> CsvTestData
+FunctionSystemIntegrationTest --> CsvTestData
+
+MainTest ..> "Main" : reflection + CLI tests
+CsvExporterTest ..> "CsvExporter"
+AbstractMathModuleTest ..> "AbstractMathModule"
+
+note right of MockitoMathModuleFactory
+  Creates CSV-driven Mockito stubs
+  for MathModule dependencies
+end note
+
+note bottom of CsvTestData
+  Reads rows from testdata/*.csv
+  and provides expected values / maps
+end note
+
+legend right
+  Arrow --> : uses helper directly
+  Dashed arrow ..> : tests production class
+endlegend
+
+@enduml
