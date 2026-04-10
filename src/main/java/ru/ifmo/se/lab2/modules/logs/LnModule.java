@@ -13,38 +13,50 @@ public final class LnModule extends AbstractMathModule {
 
     @Override
     public double calculate(double x) {
-        if (Double.isNaN(x) || x <= 0.0 || Double.isInfinite(x)) {
+        if (isInvalidInput(x)) {
             return Double.NaN;
         }
 
-        double scaled = x;
-        int scalePower = 0;
+        ScaleResult scaled = scaleToWorkingRange(x);
+        return seriesLn(scaled.value()) + scaled.powerOfTwo() * LN_2;
+    }
 
-        while (scaled > UPPER_BOUND) {
-            scaled /= 2.0;
-            scalePower++;
+    private boolean isInvalidInput(double x) {
+        return Double.isNaN(x) || x <= 0.0 || Double.isInfinite(x);
+    }
+
+    private ScaleResult scaleToWorkingRange(double x) {
+        double value = x;
+        int powerOfTwo = 0;
+
+        while (value > UPPER_BOUND) {
+            value /= 2.0;
+            powerOfTwo++;
         }
-        while (scaled < LOWER_BOUND) {
-            scaled *= 2.0;
-            scalePower--;
+        while (value < LOWER_BOUND) {
+            value *= 2.0;
+            powerOfTwo--;
         }
 
-        double y = (scaled - 1.0) / (scaled + 1.0);
+        return new ScaleResult(value, powerOfTwo);
+    }
+
+    private double seriesLn(double x) {
+        double y = (x - 1.0) / (x + 1.0);
         double ySquared = y * y;
-        double power = y;
+        double oddPower = y;
         double sum = 0.0;
-        int n = 0;
 
-        while (true) {
-            double term = power / (2 * n + 1);
+        for (int n = 0; ; n++) {
+            double term = oddPower / (2 * n + 1);
             sum += term;
             if (Math.abs(term) < epsilon) {
-                break;
+                return 2.0 * sum;
             }
-            power *= ySquared;
-            n++;
+            oddPower *= ySquared;
         }
+    }
 
-        return 2.0 * sum + scalePower * LN_2;
+    private record ScaleResult(double value, int powerOfTwo) {
     }
 }
