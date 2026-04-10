@@ -3,6 +3,7 @@ target/
 m2repo/
 lib/
 *.csv
+!src/test/resources/testdata/**/*.csv
 test-sources.txt
 Check.java
 Check.class
