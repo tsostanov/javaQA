@@ -1,0 +1,84 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam packageStyle rectangle
+
+package "ru.ifmo.se.lab2" {
+  class Main
+}
+
+package "ru.ifmo.se.lab2.io" {
+  class CsvExporter
+}
+
+package "ru.ifmo.se.lab2.modules" {
+  interface MathModule
+  abstract class AbstractMathModule
+}
+
+package "ru.ifmo.se.lab2.modules.trig" {
+  class CosModule
+  class SinModule
+  class SecModule
+  class CscModule
+  class CotModule
+}
+
+package "ru.ifmo.se.lab2.modules.logs" {
+  class LnModule
+  class LogModule {
+    - base: double
+    - lnBase: double
+  }
+}
+
+package "ru.ifmo.se.lab2.modules.system" {
+  class FunctionSystemModule
+}
+
+MathModule <|.. AbstractMathModule
+AbstractMathModule <|-- CosModule
+AbstractMathModule <|-- SinModule
+AbstractMathModule <|-- SecModule
+AbstractMathModule <|-- CscModule
+AbstractMathModule <|-- CotModule
+AbstractMathModule <|-- LnModule
+AbstractMathModule <|-- LogModule
+AbstractMathModule <|-- FunctionSystemModule
+
+SinModule --> MathModule : cosModule
+SecModule --> MathModule : cosModule
+CscModule --> MathModule : sinModule
+CotModule --> MathModule : cosModule
+CotModule --> MathModule : sinModule
+LogModule --> MathModule : lnModule
+
+FunctionSystemModule --> MathModule : cosModule
+FunctionSystemModule --> MathModule : sinModule
+FunctionSystemModule --> MathModule : secModule
+FunctionSystemModule --> MathModule : cscModule
+FunctionSystemModule --> MathModule : cotModule
+FunctionSystemModule --> MathModule : lnModule
+FunctionSystemModule --> MathModule : log2Module
+FunctionSystemModule --> MathModule : log3Module
+FunctionSystemModule --> MathModule : log5Module
+FunctionSystemModule --> MathModule : log10Module
+
+CsvExporter --> MathModule : export(module, ...)
+
+Main ..> CsvExporter
+Main ..> CosModule
+Main ..> SinModule
+Main ..> SecModule
+Main ..> CscModule
+Main ..> CotModule
+Main ..> LnModule
+Main ..> LogModule
+Main ..> FunctionSystemModule
+
+note right of FunctionSystemModule
+  x <= 0: trig branch
+  x > 0: log branch
+end note
+
+@enduml

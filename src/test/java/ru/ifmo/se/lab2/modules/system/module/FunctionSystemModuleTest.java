@@ -19,6 +19,7 @@ import ru.ifmo.se.lab2.modules.trig.CscModule;
 import ru.ifmo.se.lab2.modules.trig.SecModule;
 import ru.ifmo.se.lab2.modules.trig.SinModule;
 import ru.ifmo.se.lab2.support.CsvTestData;
+import ru.ifmo.se.lab2.support.MockitoMathModuleFactory;
 
 class FunctionSystemModuleTest {
     private static final double EPS = 1.0E-5;
@@ -121,11 +122,11 @@ class FunctionSystemModuleTest {
     }
 
     private static MathModule constantModule(double value) {
-        return x -> value;
+        return MockitoMathModuleFactory.constant(value);
     }
 
     private static MathModule nanModule() {
-        return x -> Double.NaN;
+        return MockitoMathModuleFactory.nan();
     }
 
     private static Stream<Arguments> trigBranchCases() {

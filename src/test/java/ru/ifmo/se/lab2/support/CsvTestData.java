@@ -13,7 +13,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.provider.Arguments;
-import ru.ifmo.se.lab2.support.stubs.TableMathModule;
 
 public final class CsvTestData {
     private CsvTestData() {
@@ -45,17 +44,17 @@ public final class CsvTestData {
     }
 
     public static double expected(String resourcePath, double x) {
-        Double expected = values(resourcePath).get(Double.doubleToLongBits(x));
+        Double expected = valueMap(resourcePath).get(Double.doubleToLongBits(x));
         if (expected == null) {
             throw new IllegalArgumentException("Missing tabulated expected value in " + resourcePath + " for x=" + x);
         }
         return expected;
     }
 
-    public static TableMathModule tableModule(String resourcePath, double... points) {
-        Map<Long, Double> available = values(resourcePath);
+    public static Map<Long, Double> valueMap(String resourcePath, double... points) {
+        Map<Long, Double> available = valueMap(resourcePath);
         if (points.length == 0) {
-            return TableMathModule.fromValues(available);
+            return available;
         }
 
         Set<Long> required = Arrays.stream(points)
@@ -74,10 +73,10 @@ public final class CsvTestData {
             throw new IllegalArgumentException("Missing tabulated values in " + resourcePath + " for " + required);
         }
 
-        return TableMathModule.fromValues(filtered);
+        return filtered;
     }
 
-    private static Map<Long, Double> values(String resourcePath) {
+    public static Map<Long, Double> valueMap(String resourcePath) {
         Map<Long, Double> values = new LinkedHashMap<>();
         for (Row row : rows(resourcePath)) {
             values.put(Double.doubleToLongBits(row.x()), row.expected());

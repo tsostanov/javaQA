@@ -1,6 +1,7 @@
 package ru.ifmo.se.lab2.modules.system.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -16,12 +17,11 @@ import ru.ifmo.se.lab2.modules.trig.CscModule;
 import ru.ifmo.se.lab2.modules.trig.SecModule;
 import ru.ifmo.se.lab2.modules.trig.SinModule;
 import ru.ifmo.se.lab2.support.CsvTestData;
-import ru.ifmo.se.lab2.support.stubs.ModuleStubFactory;
+import ru.ifmo.se.lab2.support.MockitoMathModuleFactory;
 
 class FunctionSystemIntegrationTest {
     private static final double PRECISION = 1.0E-10;
     private static final double PI = 3.1415926535897931;
-    private final LnModule lnModule = new LnModule(PRECISION);
 
     @ParameterizedTest
     @MethodSource("trigBranchCases")
@@ -31,26 +31,28 @@ class FunctionSystemIntegrationTest {
         SecModule sec = new SecModule(cos, PRECISION);
         CscModule csc = new CscModule(sin, PRECISION);
         CotModule cot = new CotModule(cos, sin, PRECISION);
-        MathModule lnStub = ModuleStubFactory.lnStub(0.2, 0.7, 1.5, 2.5, 3.0, PI);
-        MathModule log2Stub = ModuleStubFactory.logStub(2.0, 0.2, 0.7, 1.5, 2.5, 3.0, PI);
-        MathModule log3Stub = ModuleStubFactory.logStub(3.0, 0.2, 0.7, 1.5, 2.5, 3.0, PI);
-        MathModule log5Stub = ModuleStubFactory.logStub(5.0, 0.2, 0.7, 1.5, 2.5, 3.0, PI);
-        MathModule log10Stub = ModuleStubFactory.logStub(10.0, 0.2, 0.7, 1.5, 2.5, 3.0, PI);
+        MathModule lnStub = MockitoMathModuleFactory.tabulated("/testdata/module/logs/ln.csv", 0.2, 0.7, 1.5, 2.5, 3.0, PI);
+        MathModule log2Stub = MockitoMathModuleFactory.tabulated("/testdata/module/logs/log2.csv", 0.2, 0.7, 1.5, 2.5, 3.0, PI);
+        MathModule log3Stub = MockitoMathModuleFactory.tabulated("/testdata/module/logs/log3.csv", 0.2, 0.7, 1.5, 2.5, 3.0, PI);
+        MathModule log5Stub = MockitoMathModuleFactory.tabulated("/testdata/module/logs/log5.csv", 0.2, 0.7, 1.5, 2.5, 3.0, PI);
+        MathModule log10Stub = MockitoMathModuleFactory.tabulated("/testdata/module/logs/log10.csv", 0.2, 0.7, 1.5, 2.5, 3.0, PI);
         FunctionSystemModule system = new FunctionSystemModule(
                 cos, sin, sec, csc, cot, lnStub, log2Stub, log3Stub, log5Stub, log10Stub, PRECISION
         );
 
         assertEquals(expected, system.calculate(x), 1.0E-5);
+        verifyNoInteractions(lnStub, log2Stub, log3Stub, log5Stub, log10Stub);
     }
 
     @ParameterizedTest
     @MethodSource("logBranchCases")
     void shouldIntegrateLogBranchIntoSystemWithTrigStubs(double x, double expected) {
-        MathModule cosStub = ModuleStubFactory.cosStub(-2.3, -1.2, -0.7, -PI, 0.0);
-        MathModule sinStub = ModuleStubFactory.sinStub(-2.3, -1.2, -0.7, -PI, 0.0);
-        MathModule secStub = ModuleStubFactory.secStub(-2.3, -1.2, -0.7, -PI);
-        MathModule cscStub = ModuleStubFactory.cscStub(-2.3, -1.2, -0.7, -PI);
-        MathModule cotStub = ModuleStubFactory.cotStub(-2.3, -1.2, -0.7, -PI);
+        MathModule cosStub = MockitoMathModuleFactory.constant(0.0);
+        MathModule sinStub = MockitoMathModuleFactory.constant(0.0);
+        MathModule secStub = MockitoMathModuleFactory.constant(0.0);
+        MathModule cscStub = MockitoMathModuleFactory.constant(0.0);
+        MathModule cotStub = MockitoMathModuleFactory.constant(0.0);
+        LnModule lnModule = new LnModule(PRECISION);
         LogModule log2 = new LogModule(2.0, lnModule, PRECISION);
         LogModule log3 = new LogModule(3.0, lnModule, PRECISION);
         LogModule log5 = new LogModule(5.0, lnModule, PRECISION);
@@ -60,6 +62,7 @@ class FunctionSystemIntegrationTest {
         );
 
         assertEquals(expected, system.calculate(x), 1.0E-5);
+        verifyNoInteractions(cosStub, sinStub, secStub, cscStub, cotStub);
     }
 
     private static Stream<Arguments> trigBranchCases() {
