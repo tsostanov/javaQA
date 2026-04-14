@@ -38,6 +38,8 @@ class LogModuleTest {
 
         assertTrue(Double.isNaN(logModule.calculate(0.0)));
         assertTrue(Double.isNaN(logModule.calculate(-5.0)));
+        assertTrue(Double.isNaN(logModule.calculate(Double.NaN)));
+        assertTrue(Double.isNaN(logModule.calculate(Double.POSITIVE_INFINITY)));
     }
 
     @Test

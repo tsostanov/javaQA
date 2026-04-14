@@ -35,4 +35,15 @@ class SecModuleTest {
         verify(cosModule).calculate(1.0);
         verifyNoMoreInteractions(cosModule);
     }
+
+    @Test
+    void shouldReturnNaNWhenCosIsTooCloseToZero() {
+        MathModule cosModule = mock(MathModule.class);
+        when(cosModule.calculate(1.0)).thenReturn(1.0E-9);
+        SecModule secModule = new SecModule(cosModule, EPS);
+
+        assertTrue(Double.isNaN(secModule.calculate(1.0)));
+        verify(cosModule).calculate(1.0);
+        verifyNoMoreInteractions(cosModule);
+    }
 }

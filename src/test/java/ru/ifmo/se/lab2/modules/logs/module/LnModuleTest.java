@@ -29,7 +29,7 @@ class LnModuleTest {
     }
 
     @ParameterizedTest
-    @ValueSource(doubles = {Double.POSITIVE_INFINITY, Double.NaN})
+    @ValueSource(doubles = {Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NaN})
     void shouldReturnNaNForNonFiniteInput(double x) {
         assertTrue(Double.isNaN(lnModule.calculate(x)));
     }

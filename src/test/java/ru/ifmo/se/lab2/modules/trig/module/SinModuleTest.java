@@ -1,6 +1,7 @@
 package ru.ifmo.se.lab2.modules.trig.module;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -8,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 import ru.ifmo.se.lab2.modules.MathModule;
+import ru.ifmo.se.lab2.modules.trig.CosModule;
 import ru.ifmo.se.lab2.modules.trig.SinModule;
 
 class SinModuleTest {
@@ -23,5 +25,19 @@ class SinModuleTest {
         assertEquals(7.5, sinModule.calculate(1.23), 1.0E-12);
         verify(cosMock).calculate(shiftedArgument);
         verifyNoMoreInteractions(cosMock);
+    }
+
+    @Test
+    void shouldReturnNaNForNaNInput() {
+        SinModule sinModule = new SinModule(new CosModule(1.0E-8), 1.0E-8);
+
+        assertTrue(Double.isNaN(sinModule.calculate(Double.NaN)));
+    }
+
+    @Test
+    void shouldReturnNaNForInfiniteInput() {
+        SinModule sinModule = new SinModule(new CosModule(1.0E-8), 1.0E-8);
+
+        assertTrue(Double.isNaN(sinModule.calculate(Double.POSITIVE_INFINITY)));
     }
 }

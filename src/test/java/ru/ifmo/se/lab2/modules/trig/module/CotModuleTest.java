@@ -41,4 +41,18 @@ class CotModuleTest {
         verify(sinModule).calculate(1.0);
         verifyNoMoreInteractions(cosModule, sinModule);
     }
+
+    @Test
+    void shouldReturnNaNWhenSinIsTooCloseToZero() {
+        MathModule cosModule = mock(MathModule.class);
+        MathModule sinModule = mock(MathModule.class);
+        when(cosModule.calculate(1.0)).thenReturn(1.0);
+        when(sinModule.calculate(1.0)).thenReturn(1.0E-9);
+        CotModule cotModule = new CotModule(cosModule, sinModule, EPS);
+
+        assertTrue(Double.isNaN(cotModule.calculate(1.0)));
+        verify(cosModule).calculate(1.0);
+        verify(sinModule).calculate(1.0);
+        verifyNoMoreInteractions(cosModule, sinModule);
+    }
 }

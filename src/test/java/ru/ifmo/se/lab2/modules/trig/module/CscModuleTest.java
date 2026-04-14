@@ -35,4 +35,15 @@ class CscModuleTest {
         verify(sinModule).calculate(1.0);
         verifyNoMoreInteractions(sinModule);
     }
+
+    @Test
+    void shouldReturnNaNWhenSinIsTooCloseToZero() {
+        MathModule sinModule = mock(MathModule.class);
+        when(sinModule.calculate(1.0)).thenReturn(1.0E-9);
+        CscModule cscModule = new CscModule(sinModule, EPS);
+
+        assertTrue(Double.isNaN(cscModule.calculate(1.0)));
+        verify(sinModule).calculate(1.0);
+        verifyNoMoreInteractions(sinModule);
+    }
 }

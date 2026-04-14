@@ -54,7 +54,7 @@ class FunctionSystemModuleTest {
     }
 
     @ParameterizedTest
-    @ValueSource(doubles = {0.0, -3.1415926535897931})
+    @ValueSource(doubles = {0.0, -1.5707963267948966, -3.1415926535897931, -4.71238898038469})
     void shouldReturnNaNAtSingularPointsOfSelectedBranch(double x) {
         assertTrue(Double.isNaN(functionSystem.calculate(x)));
     }
@@ -63,6 +63,12 @@ class FunctionSystemModuleTest {
     @ValueSource(doubles = {3.1415926535897931, 2.5})
     void shouldUseLogBranchForPositiveValues(double x) {
         assertTrue(Double.isFinite(functionSystem.calculate(x)));
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {Double.NaN, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY})
+    void shouldReturnNaNForNonFiniteInput(double x) {
+        assertTrue(Double.isNaN(functionSystem.calculate(x)));
     }
 
     @ParameterizedTest
