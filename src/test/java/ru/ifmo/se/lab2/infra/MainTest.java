@@ -38,6 +38,63 @@ class MainTest {
         assertTrue(content.contains("0.5000000000"));
     }
 
+    @ParameterizedTest
+    @CsvSource({
+            "ln,0.5,1.0,0.25",
+            "log2,0.5,1.0,0.25",
+            "system,0.5,1.0,0.25"
+    })
+    void shouldWriteCsvFromCliForAdditionalModules(String moduleName, String from, String to, String step) throws IOException {
+        Path output = Files.createTempFile("tpojava-main-", ".csv");
+
+        Main.main(new String[]{moduleName, from, to, step, output.toString(), "1E-8"});
+
+        String content = Files.readString(output);
+        assertTrue(content.startsWith("x,result"));
+        assertTrue(content.contains("0.5000000000"));
+        assertEquals(4, content.lines().count());
+    }
+
+    @Test
+    void shouldRejectUnknownModuleFromCli() throws IOException {
+        Path output = Files.createTempFile("tpojava-main-", ".csv");
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> Main.main(new String[]{"unknown", "0", "1", "0.5", output.toString(), "1E-8"})
+        );
+    }
+
+    @Test
+    void shouldRejectInvalidEpsilonFromCli() throws IOException {
+        Path output = Files.createTempFile("tpojava-main-", ".csv");
+
+        assertThrows(
+                NumberFormatException.class,
+                () -> Main.main(new String[]{"cos", "0", "1", "0.5", output.toString(), "not-a-number"})
+        );
+    }
+
+    @Test
+    void shouldRejectInvalidRangeFromCli() throws IOException {
+        Path output = Files.createTempFile("tpojava-main-", ".csv");
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> Main.main(new String[]{"cos", "2", "1", "0.5", output.toString(), "1E-8"})
+        );
+    }
+
+    @Test
+    void shouldRejectNonPositiveStepFromCli() throws IOException {
+        Path output = Files.createTempFile("tpojava-main-", ".csv");
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> Main.main(new String[]{"cos", "0", "1", "0", output.toString(), "1E-8"})
+        );
+    }
+
     @Test
     void shouldPrintUsageWhenArgumentsAreMissing() throws IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();

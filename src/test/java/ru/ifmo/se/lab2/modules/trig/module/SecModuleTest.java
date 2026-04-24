@@ -9,6 +9,9 @@ import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 import ru.ifmo.se.lab2.modules.MathModule;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import ru.ifmo.se.lab2.modules.trig.CosModule;
 import ru.ifmo.se.lab2.modules.trig.SecModule;
 
 class SecModuleTest {
@@ -45,5 +48,21 @@ class SecModuleTest {
         assertTrue(Double.isNaN(secModule.calculate(1.0)));
         verify(cosModule).calculate(1.0);
         verifyNoMoreInteractions(cosModule);
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {-1.2, -0.7, 0.7})
+    void shouldBePeriodicByTwoPiWithRealCos(double x) {
+        SecModule secModule = new SecModule(new CosModule(1.0E-10), 1.0E-10);
+
+        assertEquals(secModule.calculate(x), secModule.calculate(x + 2.0 * Math.PI), 1.0E-6);
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {-1.2, -0.7, 0.7})
+    void shouldStayCloseToMathSec(double x) {
+        SecModule secModule = new SecModule(new CosModule(1.0E-10), 1.0E-10);
+
+        assertEquals(1.0 / Math.cos(x), secModule.calculate(x), 1.0E-6);
     }
 }

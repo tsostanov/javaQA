@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import ru.ifmo.se.lab2.modules.trig.CosModule;
 import ru.ifmo.se.lab2.support.CsvTestData;
 
@@ -37,6 +38,18 @@ class CosModuleTest {
     @Test
     void shouldReturnNaNForInfiniteInput() {
         assertTrue(Double.isNaN(cosModule.calculate(Double.POSITIVE_INFINITY)));
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {-2.3, -1.2, -0.7, 0.7})
+    void shouldBePeriodicByTwoPi(double x) {
+        assertEquals(cosModule.calculate(x), cosModule.calculate(x + 2.0 * Math.PI), EPS);
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {-2.3, -1.2, -0.7, 0.0, 0.7})
+    void shouldStayCloseToMathCos(double x) {
+        assertEquals(Math.cos(x), cosModule.calculate(x), EPS);
     }
 
     private static Stream<Arguments> cosCases() {

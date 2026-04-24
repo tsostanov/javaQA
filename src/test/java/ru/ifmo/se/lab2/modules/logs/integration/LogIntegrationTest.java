@@ -1,11 +1,15 @@
 package ru.ifmo.se.lab2.modules.logs.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -18,6 +22,32 @@ class LogIntegrationTest {
     private static final double EPS = 1.0E-6;
     private static final double PRECISION = 1.0E-10;
     private static final double[] POSITIVE_POINTS = {0.2, 0.7, 1.5, 2.5, 3.0, 3.1415926535897931};
+
+    @Test
+    void shouldReturnNaNWhenLnReturnsNaNForArgument() {
+        MathModule lnModule = mock(MathModule.class);
+        when(lnModule.calculate(2.0)).thenReturn(1.0);
+        when(lnModule.calculate(3.0)).thenReturn(Double.NaN);
+        LogModule logModule = new LogModule(2.0, lnModule, PRECISION);
+
+        assertTrue(Double.isNaN(logModule.calculate(3.0)));
+        verify(lnModule).calculate(2.0);
+        verify(lnModule).calculate(3.0);
+        verifyNoMoreInteractions(lnModule);
+    }
+
+    @Test
+    void shouldReturnNaNWhenLnReturnsNaNForBase() {
+        MathModule lnModule = mock(MathModule.class);
+        when(lnModule.calculate(2.0)).thenReturn(Double.NaN);
+        when(lnModule.calculate(3.0)).thenReturn(1.0);
+        LogModule logModule = new LogModule(2.0, lnModule, PRECISION);
+
+        assertTrue(Double.isNaN(logModule.calculate(3.0)));
+        verify(lnModule).calculate(2.0);
+        verify(lnModule).calculate(3.0);
+        verifyNoMoreInteractions(lnModule);
+    }
 
     @ParameterizedTest
     @MethodSource("logCases")

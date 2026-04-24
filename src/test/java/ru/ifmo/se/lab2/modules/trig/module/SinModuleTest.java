@@ -8,6 +8,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import ru.ifmo.se.lab2.modules.MathModule;
 import ru.ifmo.se.lab2.modules.trig.CosModule;
 import ru.ifmo.se.lab2.modules.trig.SinModule;
@@ -39,5 +41,21 @@ class SinModuleTest {
         SinModule sinModule = new SinModule(new CosModule(1.0E-8), 1.0E-8);
 
         assertTrue(Double.isNaN(sinModule.calculate(Double.POSITIVE_INFINITY)));
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {-2.3, -1.2, -0.7, 0.7})
+    void shouldBePeriodicByTwoPi(double x) {
+        SinModule sinModule = new SinModule(new CosModule(1.0E-10), 1.0E-10);
+
+        assertEquals(sinModule.calculate(x), sinModule.calculate(x + 2.0 * Math.PI), 1.0E-6);
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {-2.3, -1.2, -0.7, 0.0, 0.7})
+    void shouldStayCloseToMathSin(double x) {
+        SinModule sinModule = new SinModule(new CosModule(1.0E-10), 1.0E-10);
+
+        assertEquals(Math.sin(x), sinModule.calculate(x), 1.0E-6);
     }
 }
