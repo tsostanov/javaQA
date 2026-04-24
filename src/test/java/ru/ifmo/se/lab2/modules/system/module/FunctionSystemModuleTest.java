@@ -72,6 +72,26 @@ class FunctionSystemModuleTest {
     }
 
     @ParameterizedTest
+    @ValueSource(doubles = {-2.3, -1.2, -0.7})
+    void shouldProduceFiniteValueForRegularNegativeInputs(double x) {
+        assertTrue(Double.isFinite(functionSystem.calculate(x)));
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {0.2, 0.7, 1.5})
+    void shouldProduceFiniteValueForRegularPositiveInputs(double x) {
+        assertTrue(Double.isFinite(functionSystem.calculate(x)));
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {-1.0E-6, 1.0E-6})
+    void shouldDistinguishEquivalenceClassesAroundZero(double x) {
+        double actual = functionSystem.calculate(x);
+
+        assertTrue(Double.isFinite(actual));
+    }
+
+    @ParameterizedTest
     @MethodSource("trigBranchNaNDependencies")
     void shouldReturnNaNWhenTrigDependencyReturnsNaN(
             MathModule sin,

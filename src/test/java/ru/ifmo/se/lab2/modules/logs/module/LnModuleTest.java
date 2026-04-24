@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -38,6 +39,23 @@ class LnModuleTest {
     @ValueSource(doubles = {0.2, 0.7, 1.0, 1.5, 2.5, 3.0})
     void shouldStayCloseToMathLog(double x) {
         assertEquals(Math.log(x), lnModule.calculate(x), EPS);
+    }
+
+    @Test
+    void shouldBeZeroAtOne() {
+        assertEquals(0.0, lnModule.calculate(1.0), EPS);
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {0.2, 0.7})
+    void shouldBeNegativeInsideZeroToOneEquivalenceClass(double x) {
+        assertTrue(lnModule.calculate(x) < 0.0);
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {1.5, 2.5, 3.0})
+    void shouldBePositiveInsideGreaterThanOneEquivalenceClass(double x) {
+        assertTrue(lnModule.calculate(x) > 0.0);
     }
 
     private static Stream<Arguments> lnCases() {

@@ -52,7 +52,34 @@ class CosModuleTest {
         assertEquals(Math.cos(x), cosModule.calculate(x), EPS);
     }
 
+    @Test
+    void shouldReachMaximumAtZero() {
+        assertEquals(1.0, cosModule.calculate(0.0), EPS);
+    }
+
+    @Test
+    void shouldReachMinimumAtPi() {
+        assertEquals(-1.0, cosModule.calculate(Math.PI), EPS);
+    }
+
+    @ParameterizedTest
+    @MethodSource("cosEquivalenceClassCases")
+    void shouldMatchExpectedSignForCosEquivalenceClass(double x, double expectedSign) {
+        double actual = cosModule.calculate(x);
+
+        assertTrue(actual * expectedSign > 0.0);
+    }
+
     private static Stream<Arguments> cosCases() {
         return CsvTestData.arguments(COS_VALUES);
+    }
+
+    private static Stream<Arguments> cosEquivalenceClassCases() {
+        return Stream.of(
+                Arguments.of(Math.PI / 6.0, 1.0),
+                Arguments.of(2.0 * Math.PI / 3.0, -1.0),
+                Arguments.of(-2.0 * Math.PI / 3.0, -1.0),
+                Arguments.of(-Math.PI / 6.0, 1.0)
+        );
     }
 }

@@ -15,6 +15,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import ru.ifmo.se.lab2.modules.MathModule;
 import ru.ifmo.se.lab2.modules.logs.LnModule;
 import ru.ifmo.se.lab2.modules.logs.LogModule;
@@ -84,6 +85,38 @@ class LogModuleTest {
         verify(lnMock).calculate(64.0);
         verify(lnMock, times(1)).calculate(2.0);
         verifyNoMoreInteractions(lnMock);
+    }
+
+    @Test
+    void shouldBeZeroAtOneForBaseGreaterThanOne() {
+        LogModule logModule = new LogModule(2.0, lnModule, 1.0E-10);
+
+        assertEquals(0.0, logModule.calculate(1.0), EPS);
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {0.5, 0.7})
+    void shouldBeNegativeBelowOneForBaseGreaterThanOne(double x) {
+        LogModule logModule = new LogModule(2.0, lnModule, 1.0E-10);
+
+        assertTrue(logModule.calculate(x) < 0.0);
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {1.5, 2.5, 3.0})
+    void shouldBePositiveAboveOneForBaseGreaterThanOne(double x) {
+        LogModule logModule = new LogModule(2.0, lnModule, 1.0E-10);
+
+        assertTrue(logModule.calculate(x) > 0.0);
+    }
+
+    @Test
+    void shouldInvertSignClassesForBaseBetweenZeroAndOne() {
+        LogModule logModule = new LogModule(0.5, lnModule, 1.0E-10);
+
+        assertTrue(logModule.calculate(0.5) > 0.0);
+        assertEquals(0.0, logModule.calculate(1.0), EPS);
+        assertTrue(logModule.calculate(2.0) < 0.0);
     }
 
     private static Stream<Arguments> log2Cases() {
