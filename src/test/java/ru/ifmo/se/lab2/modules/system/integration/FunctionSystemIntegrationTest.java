@@ -1,6 +1,7 @@
 package ru.ifmo.se.lab2.modules.system.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -26,6 +27,66 @@ import ru.ifmo.se.lab2.support.MockitoMathModuleFactory;
 class FunctionSystemIntegrationTest {
     private static final double PRECISION = 1.0E-10;
     private static final double PI = 3.1415926535897931;
+
+    @ParameterizedTest
+    @MethodSource("trigFromMockedCosCases")
+    void shouldBuildTrigBranchBottomUpFromMockedCos(
+            double x,
+            double cosAtX,
+            double sinAtX,
+            double expected
+    ) {
+        MathModule cos = mock(MathModule.class);
+        double shifted = Math.PI / 2.0 - x;
+        when(cos.calculate(x)).thenReturn(cosAtX);
+        when(cos.calculate(shifted)).thenReturn(sinAtX);
+
+        SinModule sin = new SinModule(cos, PRECISION);
+        SecModule sec = new SecModule(cos, PRECISION);
+        CscModule csc = new CscModule(sin, PRECISION);
+        CotModule cot = new CotModule(cos, sin, PRECISION);
+        MathModule ln = mock(MathModule.class);
+        MathModule log2 = mock(MathModule.class);
+        MathModule log3 = mock(MathModule.class);
+        MathModule log5 = mock(MathModule.class);
+        MathModule log10 = mock(MathModule.class);
+        FunctionSystemModule system = new FunctionSystemModule(
+                cos, sin, sec, csc, cot, ln, log2, log3, log5, log10, PRECISION
+        );
+
+        assertEquals(expected, system.calculate(x), 1.0E-5);
+        verify(cos, atLeastOnce()).calculate(x);
+        verify(cos, atLeastOnce()).calculate(shifted);
+        verifyNoInteractions(ln, log2, log3, log5, log10);
+    }
+
+    @ParameterizedTest
+    @MethodSource("logFromMockedLnCases")
+    void shouldBuildLogBranchBottomUpFromMockedLn(double x, double lnAtX, double expected) {
+        MathModule ln = mock(MathModule.class);
+        when(ln.calculate(x)).thenReturn(lnAtX);
+        when(ln.calculate(2.0)).thenReturn(CsvTestData.expected("/testdata/module/logs/ln.csv", 2.0));
+        when(ln.calculate(3.0)).thenReturn(CsvTestData.expected("/testdata/module/logs/ln.csv", 3.0));
+        when(ln.calculate(5.0)).thenReturn(CsvTestData.expected("/testdata/module/logs/ln.csv", 5.0));
+        when(ln.calculate(10.0)).thenReturn(CsvTestData.expected("/testdata/module/logs/ln.csv", 10.0));
+
+        LogModule log2 = new LogModule(2.0, ln, PRECISION);
+        LogModule log3 = new LogModule(3.0, ln, PRECISION);
+        LogModule log5 = new LogModule(5.0, ln, PRECISION);
+        LogModule log10 = new LogModule(10.0, ln, PRECISION);
+        MathModule cos = mock(MathModule.class);
+        MathModule sin = mock(MathModule.class);
+        MathModule sec = mock(MathModule.class);
+        MathModule csc = mock(MathModule.class);
+        MathModule cot = mock(MathModule.class);
+        FunctionSystemModule system = new FunctionSystemModule(
+                cos, sin, sec, csc, cot, ln, log2, log3, log5, log10, PRECISION
+        );
+
+        assertEquals(expected, system.calculate(x), 1.0E-5);
+        verify(ln, atLeastOnce()).calculate(x);
+        verifyNoInteractions(cos, sin, sec, csc, cot);
+    }
 
     @Test
     void shouldUseTrigBranchAtZeroWithMockedDependencies() {
@@ -227,6 +288,38 @@ class FunctionSystemIntegrationTest {
                 Arguments.of(0.1, 1.0, 2.0, 3.0, 5.0, 10.0),
                 Arguments.of(0.7, -0.5, 0.25, 1.5, -2.0, 0.75),
                 Arguments.of(2.5, 2.0, -1.0, 0.5, 3.0, -4.0)
+        );
+    }
+
+    private static Stream<Arguments> trigFromMockedCosCases() {
+        return Stream.of(
+                trigFromMockedCosCase(-2.3),
+                trigFromMockedCosCase(-0.7)
+        );
+    }
+
+    private static Arguments trigFromMockedCosCase(double x) {
+        return Arguments.of(
+                x,
+                CsvTestData.expected("/testdata/integration/trig/cos-stub.csv", x),
+                CsvTestData.expected("/testdata/integration/trig/sin-stub.csv", x),
+                CsvTestData.expected("/testdata/module/system/trig-branch.csv", x)
+        );
+    }
+
+    private static Stream<Arguments> logFromMockedLnCases() {
+        return Stream.of(
+                logFromMockedLnCase(0.2),
+                logFromMockedLnCase(0.7),
+                logFromMockedLnCase(1.5)
+        );
+    }
+
+    private static Arguments logFromMockedLnCase(double x) {
+        return Arguments.of(
+                x,
+                CsvTestData.expected("/testdata/module/logs/ln.csv", x),
+                CsvTestData.expected("/testdata/module/system/log-branch.csv", x)
         );
     }
 
