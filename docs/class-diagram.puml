@@ -1,91 +1,85 @@
 @startuml
-skinparam classAttributeIconSize 0
-skinparam shadowing false
-skinparam packageStyle rectangle
 title Main Class Diagram
 
-package "ru.ifmo.se.lab2" {
-  class Main
-}
+left to right direction
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam nodesep 40
+skinparam ranksep 50
+hide empty members
 
-package "ru.ifmo.se.lab2.io" {
-  class CsvExporter
-}
+rectangle "lab2" {
+  package "Core" {
+    interface MathModule {
+      + calculate(x: double): double
+    }
 
-package "ru.ifmo.se.lab2.modules" {
-  interface MathModule
-  abstract class AbstractMathModule
-}
+    abstract class AbstractMathModule {
+      - epsilon: double
+      # safeDivide(a: double, b: double): double
+    }
+  }
 
-package "ru.ifmo.se.lab2.modules.trig" {
-  class CosModule
-  class SinModule
-  class SecModule
-  class CscModule
-  class CotModule
-}
+  package "Trig Modules" {
+    class CosModule
+    class SinModule
+    class SecModule
+    class CscModule
+    class CotModule
+  }
 
-package "ru.ifmo.se.lab2.modules.logs" {
-  class LnModule
-  class LogModule {
-    - base: double
-    - lnBase: double
+  package "Log Modules" {
+    class LnModule
+    class LogModule {
+      - base: double
+      - lnBase: double
+    }
+  }
+
+  package "System" {
+    class FunctionSystemModule
+  }
+
+  package "CLI / IO" {
+    class CsvExporter
+    class Main
   }
 }
 
-package "ru.ifmo.se.lab2.modules.system" {
-  class FunctionSystemModule
-}
+AbstractMathModule ..|> MathModule
 
-MathModule <|.. AbstractMathModule
-AbstractMathModule <|-- CosModule
-AbstractMathModule <|-- SinModule
-AbstractMathModule <|-- SecModule
-AbstractMathModule <|-- CscModule
-AbstractMathModule <|-- CotModule
-AbstractMathModule <|-- LnModule
-AbstractMathModule <|-- LogModule
-AbstractMathModule <|-- FunctionSystemModule
+CosModule --|> AbstractMathModule
+SinModule --|> AbstractMathModule
+SecModule --|> AbstractMathModule
+CscModule --|> AbstractMathModule
+CotModule --|> AbstractMathModule
+LnModule --|> AbstractMathModule
+LogModule --|> AbstractMathModule
+FunctionSystemModule --|> AbstractMathModule
 
-SinModule --> MathModule : cosModule
-SecModule --> MathModule : cosModule
-CscModule --> MathModule : sinModule
-CotModule --> MathModule : cosModule
-CotModule --> MathModule : sinModule
-LogModule --> MathModule : lnModule
+SinModule --> CosModule
+SecModule --> CosModule
+CscModule --> SinModule
+CotModule --> CosModule
+CotModule --> SinModule
 
-FunctionSystemModule --> MathModule : cosModule
-FunctionSystemModule --> MathModule : sinModule
-FunctionSystemModule --> MathModule : secModule
-FunctionSystemModule --> MathModule : cscModule
-FunctionSystemModule --> MathModule : cotModule
-FunctionSystemModule --> MathModule : lnModule
-FunctionSystemModule --> MathModule : log2Module
-FunctionSystemModule --> MathModule : log3Module
-FunctionSystemModule --> MathModule : log5Module
-FunctionSystemModule --> MathModule : log10Module
+LogModule --> LnModule
 
-CsvExporter --> MathModule : export(module, ...)
+FunctionSystemModule --> CosModule
+FunctionSystemModule --> SinModule
+FunctionSystemModule --> SecModule
+FunctionSystemModule --> CscModule
+FunctionSystemModule --> CotModule
+FunctionSystemModule --> LnModule
+FunctionSystemModule --> LogModule
 
-Main ..> CsvExporter
-Main ..> CosModule
-Main ..> SinModule
-Main ..> SecModule
-Main ..> CscModule
-Main ..> CotModule
-Main ..> LnModule
-Main ..> LogModule
-Main ..> FunctionSystemModule
+CsvExporter --> MathModule : export
 
-note right of FunctionSystemModule
-  x <= 0: trig branch
-  x > 0: log branch
-end note
-
-legend right
-  Solid triangle: inheritance / implementation
-  Arrow --> : dependency via field or method usage
-  Dashed arrow ..> : object creation / runtime usage
-endlegend
+Main --> CsvExporter
+Main --> CosModule
+Main --> LnModule
+Main --> LogModule
+Main --> FunctionSystemModule
 
 @enduml
